@@ -54,7 +54,14 @@ namespace ConsoleAppWithConfiguration
                 Settings:Container -
                 Settings:Container:Name - Second container
                 Settings:Container:Index - 2
+                Secrets -
+                Secrets:Number - 123
+                Secrets:ConnectionString - Server=(localdb)\mssqllocaldb;Database=Movie-1;Trusted_Connection=True;MultipleActiveResultSets=true
+                DOTNET_ENVIRONMENT - Development
              */
+            // NOTE: In reality the enumeration includes all the environment variables.  Apart from 
+            // DOTNET_ENVIRONMENT the environment variables have been left out of the commented
+            // list above for clarity and conciseness. 
             foreach (var pair in keyValuePairs)
             {
                 Console.WriteLine($"{pair.Key} - {pair.Value}");
@@ -148,6 +155,28 @@ namespace ConsoleAppWithConfiguration
             Console.WriteLine($"ServerOptions properties with no value in appsettings: HasInitializer: {_optionsRegisteredManually.HasInitializer}, NoInitializer: {_optionsRegisteredManually.NoInitializer}");
 
             Console.WriteLine("======================================================");
+            Console.ResetColor();
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("==============================================");
+            Console.WriteLine("Configuration 'Secrets' Section values...");
+            Console.WriteLine("==============================================");
+            // Individual settings in the appsettings.json file 'Secrets' Section read as:
+            /*
+                Number (int) value: 123
+                ConnectionString (string) value: 'Server=(localdb)\mssqllocaldb;Database=Movie-1;Trusted_Connection=True;MultipleActiveResultSets=true'
+                Reading Number via configuration.GetValue<int>(): '123'
+             */
+            IConfigurationSection secretsSection = _configuration.GetRequiredSection("Secrets");
+            int intSecret = secretsSection.GetValue<int>("Number");
+            Console.WriteLine($"Number (int) value: {intSecret}");
+            string stringSecret = secretsSection.GetValue<string>("ConnectionString");
+            Console.WriteLine($"ConnectionString (string) value: '{stringSecret}'");
+
+            int numberReadDirectly = _configuration.GetValue<int>("Secrets:Number");
+            Console.WriteLine($"Reading Number via configuration.GetValue<int>(): '{numberReadDirectly}'");
+
+            Console.WriteLine("==============================================");
             Console.ResetColor();
         }
     }
