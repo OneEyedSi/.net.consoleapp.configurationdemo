@@ -39,3 +39,7 @@ Notes
 4. Configuration providers that are added later override previous key settings. For example, if SomeKey is set in both appsettings.json and the environment, the environment value is used. Using the default configuration providers, the Command-line configuration provider overrides all other providers.
 
 5. To bind an options object to a configuration section then register it with the Dependency Injection container, without wrapping it in IOptions, we have to use the ConfigureServices overload that takes a context parameter:  ConfigureServices((context, services) => ...) rather than the overload that takes only a service parameter: ConfigureServices(services => ...)  This is because we need access to context.Configuration, to instantiate the options object and bind it to the configuration section.
+
+See Also
+--------
+[README_Secrets.md](/README_Secrets.md): Instructions on how to remove secrets from the appsettings.json file and store them safely elsewhere, out of source control.
