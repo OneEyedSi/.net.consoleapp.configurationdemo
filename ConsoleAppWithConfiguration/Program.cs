@@ -28,16 +28,15 @@ namespace ConsoleAppWithConfiguration
             var builder = Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, app) =>
                 {
-                    app.AddJsonFile("appsettings.json");
-
                     var env = hostingContext.HostingEnvironment;
                     Console.WriteLine($"Environment name: {env.EnvironmentName}");
                 })
                 // Register with Dependency injection container:
-                // Using ConfigureServices overload that takes parameters Action<HostBuilderContext> and IServiceCollection 
-                //  because services.Configure<>() and GetSection() require access to the HostBuiderContext.Configuration property.
+                // Using ConfigureServices overload that takes parameter Action<HostBuilderContext, IServiceCollection> 
+                //  because services.Configure<>() and GetSection() require access to the HostBuiderContext.Configuration 
+                //  property.
                 // Without needing to access Configuration we could use the overload of ConfigureServices that takes just
-                // the IServiceCollection.
+                // Action<IServiceCollection>.
                 .ConfigureServices((context, services) =>
                 {
                     services.AddSingleton<Worker>();
@@ -47,6 +46,7 @@ namespace ConsoleAppWithConfiguration
 
                     // This will also register an IOptions<OrderOptions> object.
                     // It requires access to the HostBuilderContext.Configuration property.
+                    // Note that the nested AddressOptions object will also be populated at the same time.
                     services.Configure<OrderOptions>(context.Configuration.GetSection("Settings:Order"));
 
                     // This allows us to register an IServerOptions object, without wrapping it in IOptions.
