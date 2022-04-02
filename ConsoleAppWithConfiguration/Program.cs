@@ -26,9 +26,12 @@ namespace ConsoleAppWithConfiguration
         private static IHostBuilder CreateHostBuilder(string[] args)
         {
             var builder = Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration(app =>
+                .ConfigureAppConfiguration((hostingContext, app) =>
                 {
                     app.AddJsonFile("appsettings.json");
+
+                    var env = hostingContext.HostingEnvironment;
+                    Console.WriteLine($"Environment name: {env.EnvironmentName}");
                 })
                 // Register with Dependency injection container:
                 // Using ConfigureServices overload that takes parameters Action<HostBuilderContext> and IServiceCollection 
