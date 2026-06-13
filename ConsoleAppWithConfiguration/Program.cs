@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using ConsoleAppWithConfiguration.ConfigurationOptions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -54,7 +55,22 @@ namespace ConsoleAppWithConfiguration
                     // If we wanted we could have registered it as a concrete type, rather than as the implementation of an 
                     // interface.
                     ServerOptions serverOptions = context.Configuration.GetSection("Settings:Server").Get<ServerOptions>();
-                    services.AddSingleton<IServerOptions>(serverOptions);                    
+                    services.AddSingleton<IServerOptions>(serverOptions);
+
+                    // Binding an array of configuration objects to an options object.  Bind to the parent object,
+                    // not the list object.  In this case the parent is the root of the configuration file, so we don't need
+                    // to use GetSection() to acccess it.
+                    // The options object must have a property named "ObjectList" to match the name of the array in the
+                    // configuration file.
+                    services.Configure<ObjectListOptions>(context.Configuration);
+
+                    // Binding a nested array of configuration objects to a list.
+                    services.Configure<List<ObjectListItem>>(context.Configuration.GetSection("Settings:NestedObjectList"));
+
+                    // Binding a nested array of configuration objects to an options object.  Bind to the parent object,
+                    // not the list object.  The options object must have a property named "NestedObjectList" to match the
+                    // name of the array in the configuration file.
+                    services.Configure<NestedObjectListOptions>(context.Configuration.GetSection("Settings"));
                 });
 
             return builder;

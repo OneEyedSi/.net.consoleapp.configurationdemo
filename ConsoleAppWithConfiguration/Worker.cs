@@ -15,15 +15,24 @@ namespace ConsoleAppWithConfiguration
         private readonly IOptions<ContainerOptions> _optionsRegisteredByAddOptions;
         private readonly IOptions<OrderOptions> _optionsRegisteredByConfigure;
         private readonly IServerOptions _optionsRegisteredManually;
+        private readonly ObjectListOptions _objectListOptions;
+        private readonly List<ObjectListItem> _objectList;
+        private readonly NestedObjectListOptions _nestedObjectListOptions;
 
         public Worker(IConfiguration configuration, IOptions<ContainerOptions> optionsRegisteredByAddOptions,
             IOptions<OrderOptions> optionsRegisteredByConfigure,
-            IServerOptions optionsRegisteredManually)
+            IServerOptions optionsRegisteredManually, 
+            IOptions<ObjectListOptions> optionsRegisteredForObjectList,
+            IOptions<List<ObjectListItem>> optionsRegisteredForList, 
+            IOptions<NestedObjectListOptions> optionsRegisteredForNestedObjectList)
         {
             this._configuration = configuration;
             this._optionsRegisteredByAddOptions = optionsRegisteredByAddOptions;
             this._optionsRegisteredByConfigure = optionsRegisteredByConfigure;
             this._optionsRegisteredManually = optionsRegisteredManually;    
+            this._objectListOptions = optionsRegisteredForObjectList.Value;
+            this._objectList = optionsRegisteredForList.Value; 
+            this._nestedObjectListOptions = optionsRegisteredForNestedObjectList.Value;
         }
 
         public void DoWork()
@@ -160,22 +169,104 @@ namespace ConsoleAppWithConfiguration
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("==============================================");
-            Console.WriteLine("Configuration 'Secrets' Section values...");
+            Console.WriteLine("Array of objects at root level...");
             Console.WriteLine("==============================================");
-            // Individual settings in the appsettings.json file 'Secrets' Section read as:
+            // Individual settings in the appsettings.json file 'ObjectList' Section read as:
             /*
-                Number (int) value: 123
-                ConnectionString (string) value: 'Server=(localdb)\mssqllocaldb;Database=Movie-1;Trusted_Connection=True;MultipleActiveResultSets=true'
-                Reading Number via configuration.GetValue<int>(): '123'
+                
              */
-            IConfigurationSection secretsSection = _configuration.GetRequiredSection("Secrets");
-            int intSecret = secretsSection.GetValue<int>("Number");
-            Console.WriteLine($"Number (int) value: {intSecret}");
-            string stringSecret = secretsSection.GetValue<string>("ConnectionString");
-            Console.WriteLine($"ConnectionString (string) value: '{stringSecret}'");
+            if (_objectListOptions == null)
+            {
+                Console.WriteLine("ObjectListOptions is null.");
+            }
+            else if (_objectListOptions.ObjectList == null)
+            {
+                Console.WriteLine("ObjectListOptions.ObjectList is null.");
+            }
+            else if (!_objectListOptions.ObjectList.Any())
+            {
+                Console.WriteLine("ObjectListOptions.ObjectList is empty.");
+            }
+            else
+            {
+                int i = 0;
+                foreach (var item in _objectListOptions.ObjectList)
+                {
+                    Console.WriteLine($"List item {i++}: Name: '{item.Name}', Index: {item.Index}.");
+                }
+            }
 
-            int numberReadDirectly = _configuration.GetValue<int>("Secrets:Number");
-            Console.WriteLine($"Reading Number via configuration.GetValue<int>(): '{numberReadDirectly}'");
+            Console.WriteLine("==============================================");
+            Console.ResetColor();
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("==============================================");
+            Console.WriteLine("Lower level array of objects...");
+            Console.WriteLine("==============================================");
+            // Individual settings in the appsettings.json file 'Settings:NestedObjectList' Section read as:
+            /*
+                
+             */
+            if (_objectList == null)
+            {
+                Console.WriteLine("NestedObjectListOptions is null.");
+            }
+            //else if (_nestedObjectListOptions.ObjectList == null)
+            //{
+            //    Console.WriteLine("NestedObjectListOptions.ObjectList is null.");
+            //}
+            //else if (!_nestedObjectListOptions.ObjectList.Any())
+            //{
+            //    Console.WriteLine("NestedObjectListOptions.ObjectList is empty.");
+            //}
+            else if (_objectList == null)
+            {
+                Console.WriteLine("NestedObjectListOptions.ObjectList is null.");
+            }
+            else if (!_objectList.Any())
+            {
+                Console.WriteLine("NestedObjectListOptions.ObjectList is empty.");
+            }
+            else
+            {
+                int i = 0;
+                foreach (var item in _objectList)
+                {
+                    Console.WriteLine($"List item {i++}: Name: '{item.Name}', Index: {item.Index}.");
+                }
+            }
+
+            Console.WriteLine("==============================================");
+            Console.ResetColor();
+
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("==============================================");
+            Console.WriteLine("Lower level array of objects in wrapper...");
+            Console.WriteLine("==============================================");
+            // Individual settings in the appsettings.json file 'Settings:NestedObjectList' Section read as:
+            /*
+                
+             */
+            if (_nestedObjectListOptions == null)
+            {
+                Console.WriteLine("NestedObjectListOptions is null.");
+            }
+            else if (_nestedObjectListOptions.NestedObjectList == null)
+            {
+                Console.WriteLine("NestedObjectListOptions.NestedObjectList is null.");
+            }
+            else if (!_nestedObjectListOptions.NestedObjectList.Any())
+            {
+                Console.WriteLine("NestedObjectListOptions.NestedObjectList is empty.");
+            }
+            else
+            {
+                int i = 0;
+                foreach (var item in _nestedObjectListOptions.NestedObjectList)
+                {
+                    Console.WriteLine($"List item {i++}: Name: '{item.Name}', Index: {item.Index}.");
+                }
+            }
 
             Console.WriteLine("==============================================");
             Console.ResetColor();
